@@ -444,7 +444,13 @@ int load_config(struct vpn_config *cfg, const char *filename)
 			cfg->routes = newNode;
 			continue;
 		} else if (strcmp(key, "saml-login") == 0) {
-			cfg->saml_port = atoi(val);
+			long port = strtol(val, NULL, 0);
+
+			if (port < 1 || port > 65535) {
+				log_error("Bad SAML listen port: \"%s\".\n", val);
+				goto err_free;
+			}
+			cfg->saml_port = (uint16_t)port;
 		} else if (strcmp(key, "user-key") == 0) {
 			free(cfg->user_key);
 			cfg->user_key = strdup(val);
@@ -562,7 +568,7 @@ void merge_config(struct vpn_config *dst, struct vpn_config *src)
 		free(dst->cookie);
 		dst->cookie = src->cookie;
 	}
-	if(src->saml_port != 0){
+	if(src->saml_port != 0) {
 		dst->saml_port = src->saml_port;
 	}
 	if (src->pinentry) {

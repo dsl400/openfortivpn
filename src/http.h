@@ -19,7 +19,6 @@
 #define OPENFORTIVPN_HTTP_H
 
 #include "tunnel.h"
-#include "config.h"
 
 #include <stdint.h>
 
@@ -31,6 +30,16 @@
 #define ERR_HTTP_BAD_RES_CODE	-5
 #define ERR_HTTP_PERMISSION	-6
 #define ERR_HTTP_NO_COOKIE	-7
+
+/*
+ * URL-encodes a string for HTTP requests.
+ *
+ * The dest buffer size MUST be at least strlen(str) * 3 + 1.
+ *
+ * @param[out] dest  the buffer to write the URL-encoded string
+ * @param[in]  str   the input string to be escaped
+ */
+void url_encode(char *dest, const char *str);
 
 static inline const char *err_http_str(int code)
 {
@@ -56,7 +65,6 @@ static inline const char *err_http_str(int code)
 int http_send(struct tunnel *tunnel, const char *request, ...);
 int http_receive(struct tunnel *tunnel, char **response, uint32_t *response_size);
 
-int saml_login(struct tunnel *tunnel);
 int auth_log_in(struct tunnel *tunnel);
 int auth_log_out(struct tunnel *tunnel);
 int auth_request_vpn_allocation(struct tunnel *tunnel);

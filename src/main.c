@@ -758,18 +758,16 @@ int main(int argc, char *argv[])
 	}
 
 	if(cfg.saml_port != 0) {
-		pthread_t server_thread;
-
-		if(pthread_create(&server_thread, NULL, start_http_server, &cfg) != 0){
-			log_error("Failed to create saml login server thread\n");
+		// Wait for the SAML token from the HTTP GET request
+		if (wait_for_http_request(&cfg) != 0) {
+			log_error("Failed to retrieve SAML cookie from HTTP\n");
 			ret = EXIT_FAILURE;
 			goto exit;
 		}
-		log_debug("Running http server on port %d\n", cfg.saml_port);
-		pthread_join(server_thread, NULL);
 
 		if (strlen(cfg.saml_session_id) == 0) {
 			log_error("Failed to receive SAML session id\n");
+			ret = EXIT_FAILURE;
 			goto exit;
 		}
 	}
