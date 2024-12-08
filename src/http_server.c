@@ -167,7 +167,7 @@ int wait_for_http_request(struct vpn_config *config) {
 	}
 
 	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	address.sin_addr.s_addr = htonl(INADDR_ANY);
 	address.sin_port = htons(saml_port);
 
 	// Forcefully attaching socket to the port
