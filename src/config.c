@@ -28,7 +28,6 @@
 
 #include "config.h"
 #include "log.h"
-#include "ipv4.h"
 
 #include <openssl/x509.h>  /* work around OpenSSL bug: missing definition of STACK_OF */
 #include <openssl/tls1.h>
@@ -38,7 +37,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 
 const struct vpn_config invalid_cfg = {
 	.gateway_host = {'\0'},
@@ -95,9 +93,6 @@ const struct vpn_config invalid_cfg = {
 	.hostcheck = NULL,
 	.check_virtual_desktop = NULL,
 };
-
-
-
 
 /*
  * Adds a sha256 digest to the list of trusted certificates.

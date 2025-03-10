@@ -287,7 +287,7 @@ static int do_http_request(struct tunnel *tunnel,
 	ret = http_send(tunnel, template, method, uri,
 	                tunnel->config->gateway_host, tunnel->config->gateway_port,
 	                tunnel->config->user_agent, tunnel->cookie,
-					strlen(data), data);
+	                strlen(data), data);
 	if (ret != 1)
 		return ret;
 
@@ -312,7 +312,7 @@ static int http_request(struct tunnel *tunnel, const char *method,
                        )
 {
 	int ret;
-	
+
 	ret = do_http_request(tunnel, method, uri, data,
 	                      response, response_size);
 	if (ret == ERR_HTTP_TLS) {
@@ -474,6 +474,7 @@ static int try_otp_auth(struct tunnel *tunnel, const char *buffer,
 	const char *s = buffer;
 	char *d = data;
 	const char *p = NULL;
+	int ret;
 	/* Length-check for destination buffer */
 #define SPACE_AVAILABLE(sz) (sizeof(data) - (d - data) >= (sz))
 	/* Get the form action */
@@ -616,7 +617,9 @@ static int try_otp_auth(struct tunnel *tunnel, const char *buffer,
 	if (!SPACE_AVAILABLE(1))
 		return -1;
 	*d++ = '\0';
-	return http_request(tunnel, "POST", path, data, res, response_size);
+	ret = http_request(tunnel, "POST", path, data, res, response_size);
+	memset(tunnel->config->otp, '\0', OTP_SIZE + 1); // clear OTP for next run
+	return ret;
 #undef SPACE_AVAILABLE
 }
 
@@ -669,12 +672,26 @@ int auth_log_in(struct tunnel *tunnel)
 
 	if (strlen(tunnel->config->saml_session_id) > 0) {
 		// SAML login
-		static const char *uri_pattern = "/remote/saml/auth_id?id=%s";
-		int required_size = snprintf(NULL, 0, uri_pattern, tunnel->config->saml_session_id) + 1;
-		char *uri = alloca(required_size);
-		snprintf(uri, required_size, uri_pattern, tunnel->config->saml_session_id);
+		static const char uri_pattern[] = "/remote/saml/auth_id?id=%s";
+		int required_size = snprintf(NULL,
+		                             0,
+		                             uri_pattern,
+		                             tunnel->config->saml_session_id)
+		                    + 1;
+		char *uri = malloc(required_size);
+
+		if (!uri) {
+			ret = -1;
+			log_error("malloc: %s\n", strerror(errno));
+			goto end;
+		}
+		snprintf(uri,
+		         required_size,
+		         uri_pattern,
+		         tunnel->config->saml_session_id);
 		log_debug("Using SAML authentication URL %s\n", uri);
 		ret = http_request(tunnel, "GET", uri, "", &res, &response_size);
+		free(uri);
 	} else if (username[0] == '\0' && tunnel->config->password[0] == '\0') {
 		ret = http_request(tunnel, "GET", "/remote/login",
 		                   data, &res, &response_size);
@@ -855,9 +872,6 @@ static int parse_xml_config(struct tunnel *tunnel, const char *buffer)
 	gateway = xml_get(xml_find(' ', "ipv4=", val, 1));
 	if (!gateway)
 		log_warn("No gateway address, using interface for routing\n");
-
-
-	
 
 	// The dns search string
 	val = buffer;

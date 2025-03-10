@@ -773,7 +773,7 @@ static int tcp_connect(struct tunnel *tunnel)
 		const char *response = NULL;
 
 		memset(&(request), 0, sizeof(request));
-		for (unsigned int j = 0; response == NULL; j++) {
+		for (size_t j = 0; response == NULL; j++) {
 			if (j >= ARRAY_SIZE(request) - 1) {
 				log_error("Proxy response is unexpectedly large and cannot fit in the %lu-bytes buffer.\n",
 				          ARRAY_SIZE(request));
@@ -819,7 +819,7 @@ static int tcp_connect(struct tunnel *tunnel)
 				};
 				const char *eol = NULL;
 
-				for (unsigned int i = 0; (i < ARRAY_SIZE(HTTP_EOL)) &&
+				for (size_t i = 0; (i < ARRAY_SIZE(HTTP_EOL)) &&
 				     (eol == NULL); i++)
 					eol = strstr(response, HTTP_EOL[i]);
 				response = eol;
@@ -1242,13 +1242,6 @@ err_tcp_connect:
 	return 1;
 }
 
-void* run_tunnel_wrapper(void *arg) {
-    struct vpn_config *config = (struct vpn_config *)arg;
-    int result = run_tunnel(config);
-    return (void *)(long)result;
-}
-
-
 int run_tunnel(struct vpn_config *config)
 {
 	int ret;
@@ -1292,6 +1285,7 @@ int run_tunnel(struct vpn_config *config)
 	}
 	log_info("Authenticated.\n");
 	log_debug("Cookie: %s\n", tunnel.cookie);
+
 	ret = auth_request_vpn_allocation(&tunnel);
 	if (ret != 1) {
 		log_error("VPN allocation request failed (%s).\n",

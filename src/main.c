@@ -31,7 +31,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #if HAVE_USR_SBIN_PPPD && HAVE_USR_SBIN_PPP
 #error "Both HAVE_USR_SBIN_PPPD and HAVE_USR_SBIN_PPP have been defined."
 #elif HAVE_USR_SBIN_PPPD
@@ -119,7 +118,7 @@ PPPD_USAGE \
 "  -p <pass>, --password=<pass>  VPN account password.\n" \
 "  --cookie=<cookie>             A valid session cookie (SVPNCOOKIE).\n" \
 "  --cookie-on-stdin             Read the cookie (SVPNCOOKIE) from standard input.\n" \
-"  --saml-login[=port]            Run a http server to handle SAML login requests\n" \
+"  --saml-login[=port]           Run a http server to handle SAML login requests\n" \
 "  -o <otp>, --otp=<otp>         One-Time-Password.\n" \
 "  --otp-prompt=<prompt>         Search for the OTP prompt starting with this string.\n" \
 "  --otp-delay=<delay>           Wait <delay> seconds before sending the OTP.\n" \
@@ -613,11 +612,13 @@ int main(int argc, char *argv[])
 			if (strcmp(long_options[option_index].name,
 			           "saml-login") == 0) {
 				long port = 8020;
-				if(optarg != NULL){
+
+				if (optarg != NULL)
 					port =	strtol(optarg, NULL, 0);
-				}
+
 				if (port < 0 || port > 65535) {
-					log_warn("Invalid saml listen port: %s! Default port is 8020 \n", optarg);
+					log_warn("Invalid saml listen port: %s! Default port is 8020 \n",
+					         optarg);
 					break;
 				}
 				cli_cfg.saml_port = port;
@@ -733,7 +734,8 @@ int main(int argc, char *argv[])
 			goto user_error;
 		}
 	// If username but no password given, interactively ask user
-	if (!cfg.password_set && cfg.username[0] != '\0' && !cfg.cookie && !cfg.saml_port) {
+	if (!cfg.password_set && cfg.username[0] != '\0'
+	    && !cfg.cookie && !cfg.saml_port) {
 		char hint[USERNAME_SIZE + 1 + REALM_SIZE + 1 + GATEWAY_HOST_SIZE + 10];
 
 		sprintf(hint, "%s_%s_%s_password",
@@ -757,7 +759,7 @@ int main(int argc, char *argv[])
 		goto exit;
 	}
 
-	if(cfg.saml_port != 0) {
+	if (cfg.saml_port != 0) {
 		// Wait for the SAML token from the HTTP GET request
 		if (wait_for_http_request(&cfg) != 0) {
 			log_error("Failed to retrieve SAML cookie from HTTP\n");
