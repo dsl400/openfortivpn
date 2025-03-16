@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([openfortivpn], [1.22.1])
+AC_INIT([openfortivpn], [1.23.1])
 AC_CONFIG_SRCDIR([src/main.c])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 
@@ -64,6 +64,7 @@ pthread.h \
 strings.h \
 sys/ioctl.h \
 syslog.h \
+sys/select.h \
 sys/socket.h \
 sys/stat.h \
 sys/types.h \
