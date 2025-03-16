@@ -31,7 +31,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #if HAVE_USR_SBIN_PPPD && HAVE_USR_SBIN_PPP
 #error "Both HAVE_USR_SBIN_PPPD and HAVE_USR_SBIN_PPP have been defined."
 #elif HAVE_USR_SBIN_PPPD

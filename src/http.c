@@ -287,7 +287,7 @@ static int do_http_request(struct tunnel *tunnel,
 	ret = http_send(tunnel, template, method, uri,
 	                tunnel->config->gateway_host, tunnel->config->gateway_port,
 	                tunnel->config->user_agent, tunnel->cookie,
-					strlen(data), data);
+	                strlen(data), data);
 	if (ret != 1)
 		return ret;
 
@@ -312,7 +312,7 @@ static int http_request(struct tunnel *tunnel, const char *method,
                        )
 {
 	int ret;
-	
+
 	ret = do_http_request(tunnel, method, uri, data,
 	                      response, response_size);
 	if (ret == ERR_HTTP_TLS) {
@@ -872,9 +872,6 @@ static int parse_xml_config(struct tunnel *tunnel, const char *buffer)
 	gateway = xml_get(xml_find(' ', "ipv4=", val, 1));
 	if (!gateway)
 		log_warn("No gateway address, using interface for routing\n");
-
-
-	
 
 	// The dns search string
 	val = buffer;

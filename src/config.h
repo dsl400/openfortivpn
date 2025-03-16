@@ -149,8 +149,6 @@ struct vpn_config {
 	char			*check_virtual_desktop;
 };
 
-
-
 int add_trusted_cert(struct vpn_config *cfg, const char *digest);
 int strtob(const char *str);
 int parse_min_tls(const char *str);
